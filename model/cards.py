@@ -136,7 +136,12 @@ def encodeReview(user, decision, comment):
 def decodeReview(text):
     lines = text.split('\n')
 
-    return (lines[1].split(':')[1].strip(), lines[2].split(':')[1].strip(), lines[3].split(':')[1].strip())
+    comment = lines[3].split(':')[1].strip() + '\n'
+    if len(lines) > 4:
+        for line in lines[4:]:
+            comment += line + '\n'
+
+    return (lines[1].split(':')[1].strip(), lines[2].split(':')[1].strip(), comment)
 
 
 if __name__ == "__main__":
