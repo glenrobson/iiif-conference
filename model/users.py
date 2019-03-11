@@ -49,4 +49,31 @@ def createUserFile():
         json.dump(users_json, outfile)
 
 if __name__ == "__main__":
-    createUserFile()
+    if len(sys.argv) > 1:
+        email="""
+Hi,\n
+Please find your username and password for the Goettingen submission review system below. The system is aviliable at:
+
+https://gottingen2019.iiif.io/
+
+and your login details are:
+
+Username: {}
+Password: {}
+
+Further details will follow, but if you have any problems logging in please get in contact.
+
+Thanks
+
+        """.encode('utf-8')
+        # Print emails
+        board_id = '5c4adffeb3561e33298068b6'
+        users = getUsers(board_id)
+        for user in users.values():
+            username = user['username']
+            password = user['fullName'].split(' ')[0]
+
+            print(email.format(username, password))
+
+    else:
+        createUserFile()
