@@ -1,0 +1,14 @@
+Hi,
+
+Please find your username and password for the Boston 2020 submission review system below. The system is available at:
+
+https://conference.iiif.io/
+
+and your login details are:
+
+ * Username: {}
+ * Password: {}
+
+Further details will follow, but if you have any problems logging in please get in contact.
+
+Thanks

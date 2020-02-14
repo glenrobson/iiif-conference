@@ -1,0 +1,31 @@
+Dear {{paper['name']}},
+
+Thank you for submitting the following paper to the IIIF Göttingen Conference:
+
+{{paper['title']}}
+
+Your proposal has been accepted and we look forward to hearing your talk at the conference.
+
+% if paper['type'] == 'Lightning talk':
+Please note due to the amount of lightning talks submitted, not all can be accommodated on the Wednesday plenary. We are planning to put together the program over the next three weeks and will send you a draft so you can see the location of your talk. 
+% else:    
+We are planning to put together the program over the next three weeks and this may result in some switching between formats of presentations. We hope this won't be necessary but if this is required I will be in contact.
+% end
+
+We will publish the information you submitted in the proposal to the conference website and I would be grateful if you could let me know of any changes that are required to the following:
+
+{{ paper['url'] }}
+
+Information on the conference can be found on the iiif.io website:
+
+https://iiif.io/event/2019/goettingen/
+
+We hope to release registration soon and please stay tuned to the iiif-discuss@googlegroups.com email group for the announcement.  
+
+Thank you again for submitting your talk. 
+
+Glen Robson on behalf of the Göttingen Program committee
+IIIF Technical Coordinator
+International Image Interoperability Framework (IIIF) Consortium
+http://iiif.io
+
