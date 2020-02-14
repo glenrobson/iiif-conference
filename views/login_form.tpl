@@ -1,4 +1,7 @@
 <!DOCTYPE html>
+
+% from model.config import Config
+% conf = Config()
 <html>
 <head>
 	<title>Login Page</title>
@@ -13,7 +16,7 @@
 	<!--Custom styles-->
 	<link rel="stylesheet" type="text/css" href="static/css/login.css">
 </head>
-<body>
+<body style="background-image: url('{{ conf.website('hero_image') }}');">
 <div class="container">
 	<div class="d-flex justify-content-center h-100">
 		<div class="card">
@@ -42,7 +45,7 @@
 			</div>
 			<div class="card-footer">
 				<div class="d-flex justify-content-center links">
-					IIIF Göttingen Conference System
+                    {{ conf.website('title') }}
 				</div>
 			</div>
 		</div>

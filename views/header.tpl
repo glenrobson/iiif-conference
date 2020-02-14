@@ -1,4 +1,7 @@
 <!doctype html>
+
+% from model.config import Config
+% conf = Config()
 <html lang="en">
     <head>
     <!-- Required meta tags -->
@@ -14,11 +17,11 @@
     <link href="{{ path }}static/css/bootstrap-4-hover-navbar.css" rel="stylesheet">
 </style>
 </head>
-<body>
+<body style="background-image: url('{{ conf.website('hero_image') }}');">
 <!-- navbar navbar-expand-md navbar-dark bg-dark mb-4-->
 <nav class="navbar navbar-expand-md navbar-dark bg-dark btco-hover-menu">
     <a class="navbar-brand" href="https://iiif.io"><img src="https://i0.wp.com/www.clir.org/wp-content/uploads/sites/6/2016/09/IIIF-logo-500w.png?w=500&ssl=1" height="30px"/></a>
-    <a class="navbar-brand" href="/index.html"> IIIF Göttingen Conference System</a>
+    <a class="navbar-brand" href="/index.html">{{ conf.website('title') }}</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
     </button>
