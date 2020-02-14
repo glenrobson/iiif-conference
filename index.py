@@ -7,8 +7,10 @@ from bottle import route, run, template,debug, get, static_file, post, get,reque
 from beaker.middleware import SessionMiddleware
 from cork import Cork
 from model import cards, boards, users 
+from model.config import Config
 
-board_id = '5c4adffeb3561e33298068b6'
+conf = Config()
+board_id = conf.board_id
 
 decisionMap = {
     3: 'Strong Accept',
@@ -23,7 +25,7 @@ decisionMap = {
 (lists, idLists) = boards.getLists(board_id)
 labels = boards.getLabels(board_id)
 
-users.createUserFile()
+users.createUserFile(board_id)
 boardUsers = users.getUsers(board_id)
 
 cards  = cards.Cards(lists, labels)
