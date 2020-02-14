@@ -3,3 +3,4 @@ bottle-cork
 markdown
 beaker
 requests
+pyyaml

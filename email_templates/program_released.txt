@@ -1,0 +1,49 @@
+Dear {{paper['name']}},
+
+The draft program is now available at:
+
+https://iiif.io/event/2019/goettingen/wednesday/ (Lightning talks)
+https://iiif.io/event/2019/goettingen/thursday/ (Presentations & Panels)
+https://iiif.io/event/2019/goettingen/friday/ (Presentations, Panels and Lightning talks)
+
+I hope to move this out of draft next week so please let me know any changes required. Your abstract is accessible at:
+
+{{ paper['url'] }} 
+
+Please note the times and locations are still being discussed. Please don't rely on these times until it is out of draft. 
+
+Also we have opened registration for the conference and this is available on Eventbrite:
+
+https://www.eventbrite.co.uk/e/2019-iiif-annual-conference-tickets-58796011453
+
+There are two ticket types for the conference:
+
+ * Non-IIIF Consortium Member
+ * IIIF Consortium Member - if you work at one of the IIIF Consortium institutions: https://iiif.io/community/consortium/
+
+These two tickets will give you access to the Workshops on Tuesday and the conference Wednesday to Friday. There is also a free Showcase ticket which can be added to your basket when you purchase one of the above conference tickets. This will give you access to the Showcase on Monday.
+
+Please also see the following Hotels where we have a conference discount:
+
+https://iiif.io/event/2019/goettingen-hotels/
+
+Lightning talks
+Due to the amount of lightning talks submitted we have had to split them over two days with most on Wednesday and some on Friday. Please plan to speak for between 7 to 8 minutes. 
+
+Presentations
+These are in 1.5 hour sessions and are grouped into 3 presentations. Each presentation should last for around 27mins including time for questions to leave time for the next presenter to get setup.  
+
+Panels
+These are set for 1.5 hours and should include time for questions and audience participation. 
+
+For further details on the conference please see the conference website:
+
+https://iiif.io/event/2019/goettingen/ 
+
+Thanks
+
+Glen Robson on behalf of the Göttingen Program committee
+IIIF Technical Coordinator
+International Image Interoperability Framework (IIIF) Consortium
+https://iiif.io
+
