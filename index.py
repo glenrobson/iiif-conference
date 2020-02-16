@@ -3,7 +3,7 @@ import sys
 import json
 import os
 import bottle
-from bottle import route, run, template,debug, get, static_file, post, get,request, redirect
+from bottle import route, run, template,debug, get, static_file, post, get,request, redirect, response
 from beaker.middleware import SessionMiddleware
 from cork import Cork
 from model import cards, boards, users 
@@ -63,7 +63,7 @@ def showAdmin():
     aaa.require(fail_redirect='/login.html')
     aaa.require(role='admin', fail_redirect='/index.html')
     
-    return template('views/admin.tpl', role=aaa.current_user.role)
+    return template('views/admin/admin.tpl', role=aaa.current_user.role)
       
 @route('/admin/assignment.html')
 def showAssignment():
@@ -72,8 +72,43 @@ def showAssignment():
 
     data = cards.getCardsByUser(board_id)
 
-    return template('views/cardsByUser.tpl', data= data, role=aaa.current_user.role, lists=idLists)
+    return template('views/admin/cardsByUser.tpl', data= data, role=aaa.current_user.role, lists=idLists)
+@post('/admin/assignCard')
+def assignCard():
+    aaa.require(fail_redirect='/login.html')
+    aaa.require(role='admin', fail_redirect='/index.html')      
 
+    data = request.json
+    results = cards.assignCard(data['user_id'], data['card_id'])
+    response.content_type = 'application/json'
+    return json.dumps(results)
+
+@get('/admin/assignCards.html')
+def assignCards():
+    aaa.require(fail_redirect='/login.html')
+    aaa.require(role='admin', fail_redirect='/index.html')      
+
+    return template('views/admin/assignCards.tpl', role=aaa.current_user.role)
+
+@route('/admin/cards.json')
+def showCards():
+    aaa.require(fail_redirect='/login.html')
+    aaa.require(role='admin', fail_redirect='/index.html')      
+
+    response.content_type = 'application/json'
+    data = cards.getCardsByUser(board_id)
+    return json.dumps(data)
+
+@route('/admin/users.json')
+def showUsers():
+    aaa.require(fail_redirect='/login.html')
+    aaa.require(role='admin', fail_redirect='/index.html')      
+
+    response.content_type = 'application/json'
+    data = users.getUsers(board_id)
+    return json.dumps(data)
+
+    
 @route('/index.html')
 @route('/')
 def showIndex():

@@ -75,6 +75,31 @@ class Cards:
                 url = "https://api.trello.com/1/cards/{}{}&idList={}".format(cardId, self.security, self.lists[decision])
                 response = requests.request("PUT", url)
 
+
+    def assignCard(self, userId, cardId):
+        # First remove all other assigned users
+        url = 'https://api.trello.com/1//cards/{}/members{}'.format(cardId, self.security)
+        members = requests.get(url).json()
+        for member in members:
+            url = 'https://api.trello.com/1/cards/{}/idMembers/{}{}'.format(cardId, member['id'], self.security)
+            response = requests.request("DELETE", url)
+
+        if userId:
+            # Then add new one
+            url = 'https://api.trello.com/1/cards/{}/idMembers{}&value={}'.format(cardId, self.security, userId)
+
+            response = requests.request("POST", url)
+            if response.status_code == 200:
+                return { "status": "Success"}
+            else:
+                return { 
+                    "status":"error",
+                    "description": response.reason
+                }
+        else:
+            # If user is none then is should be unassigend i.e. no user assigned
+            return { "status": "Success"}
+
     def updateFlagged(self, cardId, flagged):
         card = self.getCard(cardId)
         cardFlagged = False
