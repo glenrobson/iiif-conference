@@ -1,6 +1,6 @@
 % from model import cards
 
-<% include('views/header.tpl', title='Submissions asssigned to user', path='', role=role) %>
+<% include('views/header.tpl', title='Submissions asssigned to user', path='../', role=role) %>
 
     <main role="main" class="container">
       <div class="jumbotron">

@@ -4,7 +4,8 @@
         <h1>Admin Functions</h1>
         <!--<p class="lead">Admin actions:</p>-->
         <ul>
-            <li><a href="/admin/assignment.html">List proposals by PC member.</a></li>
+            <li><a href="/admin/assignment.html">List proposals by PC member</a></li>
+            <li><a href="/admin/assignCards.html">Assign papers to PC members</a></li>
         </ul>    
       </div>
     </main>
