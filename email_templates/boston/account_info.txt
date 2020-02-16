@@ -9,6 +9,17 @@ and your login details are:
  * Username: {}
  * Password: {}
 
-Further details will follow, but if you have any problems logging in please get in contact.
+Please review your submissions by the 21st so we can meet to discuss them. 
+
+If you mark any as Borderline Paper or below please add a comment to say why. If I’ve accidentally assigned a paper which you have a conflict of interest. Please select reassign in the drop down.
+
+If you notice any submissions that need looking at please click the Flag for discussion check box. Reasons for flagging could include:
+
+ * Mistakes in the submission e.g. Title incorrect
+ * Comments to PC in submission e.g. I can only present on Wednesday or I would like to present remotely.
+
+For information the CFP which we can use to rate the submission is available at:
+
+https://docs.google.com/document/d/1roAgIupchx_h4a8FKy1Yy7A0w2HKkJMYBZumJ5aVrRs/edit
 
 Thanks
