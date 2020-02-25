@@ -30,9 +30,11 @@ if __name__ == "__main__":
 
     outputList = []
     for card in acceptedCards:
-        #cardData = cards.decodeCard(card)
-
-        outputList.append(card)
+        cardData = cards.decodeCard(card)
+        # Remove private submission related data:
+        cardData.pop('comments', None)
+        cardData.pop('contact', None)
+        outputList.append(cardData)
 
     with open(sys.argv[1], 'w') as outfile:
         yaml.safe_dump(outputList, outfile, default_flow_style=False)    

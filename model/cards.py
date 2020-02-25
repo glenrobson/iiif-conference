@@ -4,6 +4,7 @@ import json
 import trello
 import requests
 import users
+import re
 
 class Cards:
     security = ''
@@ -177,6 +178,73 @@ def decodeReview(text):
 
     return (lines[1].split(':')[1].strip(), lines[2].split(':')[1].strip(), comment)
 
+def decodeCard(card):
+    cardData = {
+        'id': re.findall(r"^[0-9]+", card['name'])[0],
+        'title': re.sub(r"^[0-9]+. (.*) by .*$", r"\1", card['name'])
+    }
+    cardData['flagged'] = False
+    for label in card['labels']:
+        if label['name'] == 'Flagged':
+            cardData['flagged'] = True
+        else:
+            cardData['type'] = label['name']
+    mode = ""        
+    for line in card['desc'].splitlines():
+        if line == '**Contact**':
+            mode = 'Contact'
+        elif line == '**Authors**':
+            mode = 'Author'
+        elif line == '**Comments**':
+            mode = 'Comment'
+        elif line == '**Topics**':
+            mode = 'Topic'
+        elif line.startswith('**Keywords:**'):
+            cardData['keywords'] = []
+            for keyword in line[14:].split(','):
+                cardData['keywords'].append(keyword.strip())
+
+        elif line == '**Abstract:**':
+            mode = 'Abstract'
+        else:
+            #print ('mode {} line "{}" '.format(mode, line))
+            if mode == 'Contact' and line.startswith(' - '):
+                cardData['contact'] = {
+                    'name': line[3:].split(',')[0],
+                    'email': line.split(', ')[1]
+                }
+            elif mode == 'Author' and line.startswith('- '):    
+                if 'authors' not in cardData:
+                    cardData['authors'] = []
+                
+                author = {
+                    'name': line[2:].split(',')[0],
+                    'company': line.split(', ')[1],
+                }
+                if len(line.split(', ')) > 2:
+                    author['location'] = line.split(', ')[2]
+
+                cardData['authors'].append(author)
+            elif mode == 'Comment' and len(line.strip()) > 0:
+                if 'comments' not in cardData:
+                    cardData['comments'] = line
+                else:
+                    cardData['comments'] += line
+
+            elif mode == 'Topic' and line.startswith('- '):    
+                if 'topic' not in cardData:
+                    cardData['topic'] = [ line[2:] ]
+                else:
+                    cardData['topic'].append(line[2:])
+
+            elif mode == 'Abstract':
+                if 'abstract' not in cardData:
+                    cardData['abstract'] = line + '\n'
+                else:
+                    cardData['abstract'] += line + '\n'
+                    
+    cardData['abstract'] = '<p>{}</p>'.format(cardData['abstract'].encode('utf-8').replace("\n\n","</p><p>"))
+    return cardData
 
 if __name__ == "__main__":
     cards = Cards({
