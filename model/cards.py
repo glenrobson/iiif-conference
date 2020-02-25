@@ -25,6 +25,15 @@ class Cards:
                 
         return userCards        
 
+    def getCardsFromLists(self, lists):
+        cards = []
+        for trelloList in lists:
+            url = 'https://api.trello.com/1/lists/{}/cards{}'.format(self.lists[trelloList], self.security)
+            listCards = requests.get(url).json()
+            cards.extend(listCards)
+                
+        return cards            
+
     def getCard(self, cardId, user=None):
         url = 'https://api.trello.com/1/cards/{}{}'.format(cardId, self.security)
         # add reviews

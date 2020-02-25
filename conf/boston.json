@@ -2,9 +2,16 @@
     "board_id": "5e45bec960c5af7dbe375164",
     "website": {
         "title": "IIIF Boston Conference System",
-        "hero_image": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/ea/Ray_and_Maria_Stata_Center_%28MIT%29.JPG/2560px-Ray_and_Maria_Stata_Center_%28MIT%29.JPG"
+        "hero_image": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/ea/Ray_and_Maria_Stata_Center_%28MIT%29.JPG/2560px-Ray_and_Maria_Stata_Center_%28MIT%29.JPG",
+        "submission_url": {
+            "preview": "https://preview.iiif.io/root/gottigen-program/event/2019/goettingen/program/{}/"
+        }
     },
     "email_templates": {
-        "account_info": "email_templates/boston/account_info.txt"
+        "account_info": "email_templates/boston/account_info.txt",
+        "accept_submission": {
+            "subject": "2020 IIIF Boston Conference Submission",
+            "text": "email_templates/boston/accept_submission.txt"
+        }
     }
 }

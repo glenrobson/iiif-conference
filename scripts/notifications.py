@@ -98,7 +98,7 @@ if __name__ == "__main__":
                     'name': cardData['contact']['name'],
                     'title':cardData['title'],
                     'type': cardData['type'],
-                    'url':'https://preview.iiif.io/root/gottigen-program/event/2019/goettingen/program/{}/'.format(cardData['id'])
+                    'url': config.website('submission_url')['preview'].format(cardData['id'])
                 }
 
                 emailClient = emailhelper.createEmailClient()
@@ -110,10 +110,10 @@ if __name__ == "__main__":
                 else:
                     to = cardData['contact']['email']
 
-                subject = '2019 Göttingen IIIF Conference submission'
+                subject = conf.email_template_config('accept_submission')['subject']
 
                 # create populated email template
-                text = template('email_templates/accept.txt', paper=emailData)
+                text = template(conf.email_template_config('accept_submission')['text'], paper=emailData)
 
                 if cardData['flagged']:
                     filename = "/tmp/flagged/{}.txt".format(cardData['id'])
@@ -143,8 +143,9 @@ if __name__ == "__main__":
                         cardsObj.updateFlagged(True)
                         cardsObj.addComment(card['id'], comment)
                     else:    
-                        # move card to 'Ready to Go'
-                        cardsObj.moveCardToList(card['id'], 'Ready to go')
+                        if not test:
+                            # move card to 'Ready to Go'
+                            cardsObj.moveCardToList(card['id'], 'Ready to go')
             else:
                 print ('Skipping as no type: {}'.format(card['name']))
             

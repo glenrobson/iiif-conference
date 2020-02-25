@@ -11,6 +11,10 @@ Submissions are entered using a Google form and a google script converts these s
  5. Line 190: Converting submission type to labels. You need to map the submission types in the form to trello label ids which you can get from: https://api.trello.com/1/boards/5e45bec960c5af7dbe375164/labels
 
 ## Trello setup
+
+This systems manages the flow between different stages of the acceptance and contacting process. Each of these stages requires different trello lists to be in place.
+
+### Evaluation of submissions
 All Program Committee members need to be members of the trello board so they can review submissions. The trello board has the following lists:
 
  * Inbox - where submissions initially arise. 
@@ -22,6 +26,48 @@ All Program Committee members need to be members of the trello board so they can
  * Reject
 
 This system allows Program Committee members to review the submissions assigned to them and select a review category from the list above.
+
+### Building the draft program
+
+
+### Notification of acceptance
+
+The evaluation stage will leave cards in the lists stated above and some will be flagged for further discussion. The script:
+
+```
+./scripts/notifications.py accept_submission
+```
+
+Will notify all submissions in the `Strong Accept`, `Accept`, `Weak Accept` and `Borderline Paper` catogries that aren't flagged that their submission has been accepted. If the email sends succefully then the cards will be moved to a `Ready to go` list which needs to be present. 
+
+To setup the email account details add the following lines to the enviroment:
+
+```
+export SMTP="host:port"
+export SMTP_USER="username"
+export SMTP_PASS="pass"
+```
+
+To set the text of the message set the following property in the config under `email_templates`. You can also set the preview URL for the submission details under the website part of the config:
+
+```
+    "website": {
+        "submission_url": {
+            "preview": "https://preview.iiif.io/root/gottigen-program/event/2019/goettingen/program/{}/"
+        }
+    },
+    "email_templates": {
+        "accept_submission": {
+            "subject": "2020 IIIF Boston Conference Submission",
+            "text", "email_templates/boston/accept_submission.txt"
+        }
+    }    
+```
+
+The subject is the subject of the email message and the text is the text in `bottle` template format and the following details can be subsituted:
+ * `{{ name }}`: Name of the submissions submitter
+ * `{{ title }}`: Name of the submission
+ * `{{ type}}`: Type of submission e.g. Presentation / Lightning talk / Panel
 
 ## Running
 This project can be run either by running the python files or running the following docker script:

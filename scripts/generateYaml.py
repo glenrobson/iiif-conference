@@ -18,15 +18,21 @@ if __name__ == "__main__":
     labels = boards.getLabels(board_id)
 
     cardsObj = cards.Cards(lists, labels)
+    # Acceptance process build draft program
+    if 'Strong Accept' in lists:
+        acceptedCards = cardsObj.getCardsFromLists(['Strong Accept', 'Accept', 'Weak Accept', 'Borderline Paper']) 
+    # Acceptance email gone. Ongoing contact work to get to approval    
+    elif 'Questions on acceptance':    
+        acceptedCards = cardsObj.getCardsFromLists(['Questions on acceptance','Scheduling', 'Needs work', 'Ready to go','Program Ready']) 
+    # Final state, cleaning up last stragglers     
+    else:    
+        acceptedCards = cardsObj.getCardsFromLists(['Scheduling', 'Needs work', 'Ready to go','Program Ready']) 
 
-    #acceptedCards = cardsObj.getCardsFromLists(['Strong Accept', 'Accept', 'Weak Accept', 'Borderline Paper']) 
-    #acceptedCards = cardsObj.getCardsFromLists(['Questions on acceptance','Scheduling', 'Needs work', 'Ready to go','Program Ready']) 
-    acceptedCards = cardsObj.getCardsFromLists(['Scheduling', 'Needs work', 'Ready to go','Program Ready']) 
     outputList = []
     for card in acceptedCards:
-        cardData = cards.decodeCard(card)
+        #cardData = cards.decodeCard(card)
 
-        outputList.append(cardData)
+        outputList.append(card)
 
     with open(sys.argv[1], 'w') as outfile:
         yaml.safe_dump(outputList, outfile, default_flow_style=False)    

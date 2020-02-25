@@ -18,6 +18,10 @@ class Config:
     def email_template(self, name):    
         with open(self.config['email_templates'][name], 'r') as outfile:
             return outfile.read()
+
+    def email_template_config(self, name):
+        return self.config['email_templates'][name]
+
     def website(self, name):
         return self.config['website'][name]
 
