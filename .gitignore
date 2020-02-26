@@ -1,6 +1,9 @@
 .DS_Store
 .apikeys
+credentials.json
+token.pickle
 conf/users.json
+conf/users*.json
 *.swp
 # Byte-compiled / optimized / DLL files
 __pycache__/
