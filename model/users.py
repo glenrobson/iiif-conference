@@ -1,10 +1,19 @@
 #!/usr/bin/python
 
 import json
-import trello
+if __name__ != "__main__":
+    from . import trello
+    from .config import Config
+else:
+    import os,sys,inspect
+    currentdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
+    parentdir = os.path.dirname(currentdir)
+    sys.path.insert(0,parentdir) 
+    from model import trello
+    from model.config import Config
+
 import requests
 import sys
-from config import Config
 from cork import Cork
 
 def getUsers(boardId):

@@ -1,7 +1,7 @@
 #!/usr/bin/python
 
 import json
-import trello
+from . import trello
 import requests
 import sys
 from cork import Cork
