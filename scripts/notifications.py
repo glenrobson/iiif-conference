@@ -125,7 +125,7 @@ if __name__ == "__main__":
                     print ('Saved email to {} in {} as presentation is flagged - {}'.format(cardData['contact']['email'], filename, card['name']))
                     with io.open(filename, mode="w", encoding='utf-8') as text_file:
                         text_file.write(u'To: {}\n'.format(to))
-                        text_file.write(u'Subject: 2019 Göttingen IIIF Conference submission\n\n')
+                        text_file.write(u'Subject: {}\n\n'.format(subject))
                         text_file.write(text)
                         text_file.close()
                 else:
