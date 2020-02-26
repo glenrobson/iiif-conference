@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python3
 # coding=utf-8 
 
 import os,sys,inspect
@@ -95,28 +95,33 @@ if __name__ == "__main__":
             if 'type' in cardData:
                 # Create email card data
                 emailData = {
+                    'id': cardData['id'],
                     'name': cardData['contact']['name'],
-                    'title':cardData['title'],
+                    'title': cardData['title'],
                     'type': cardData['type'],
-                    'url': config.website('submission_url')['preview'].format(cardData['id'])
+                    'url': conf.email_template_config('accept_submission')['preview'].format(cardData['id'])
                 }
 
-                emailClient = emailhelper.createEmailClient()
+                emailClient = emailhelper.createEmailClient(gmail=True)
 
-                fromAddr = 'glen.robson@iiif.io'
+                fromAddr = conf.email_template_config('accept_submission')['from']
                 # get contact email address
                 if test:
                     to = 'glen.robson@gmail.com'
                 else:
                     to = cardData['contact']['email']
 
-                subject = conf.email_template_config('accept_submission')['subject']
+                subject = template(conf.email_template_config('accept_submission')['subject'], paper=emailData)
 
                 # create populated email template
                 text = template(conf.email_template_config('accept_submission')['text'], paper=emailData)
 
                 if cardData['flagged']:
-                    filename = "/tmp/flagged/{}.txt".format(cardData['id'])
+                    tmp_dir = "/tmp/flagged"
+                    filename = "{}/{}.txt".format(tmp_dir, cardData['id'])
+                    if not os.path.exists(tmp_dir):
+                        os.makedirs(tmp_dir)
+
                     print ('Saved email to {} in {} as presentation is flagged - {}'.format(cardData['contact']['email'], filename, card['name']))
                     with io.open(filename, mode="w", encoding='utf-8') as text_file:
                         text_file.write(u'To: {}\n'.format(to))
@@ -124,7 +129,7 @@ if __name__ == "__main__":
                         text_file.write(text)
                         text_file.close()
                 else:
-                    logo = emailhelper.createAttachment('static/img/logo_67_67.png', 'png')
+                    logo = emailhelper.createAttachment('static/img/logo_67_67.png', 'png', 'IIIF_logo.png')
                     message = emailhelper.createMessage(text=text, html=None, attachments = [logo])
 
                     # send email
@@ -132,7 +137,7 @@ if __name__ == "__main__":
                     problems = emailClient.send(fromAddr, to, subject, message)
 
                     # add comment to card with email
-                    comment = 'Contact\nType: acceptance\nTo: {}\nEmail:\n\n'.format(to)
+                    comment = 'Contact\nType: acceptance\nTo: {}\nSubject: {}\nEmail:\n\n'.format(to, subject)
                     comment += text
                     cardsObj.addComment(card['id'], comment)
 
@@ -143,9 +148,9 @@ if __name__ == "__main__":
                         cardsObj.updateFlagged(True)
                         cardsObj.addComment(card['id'], comment)
                     else:    
-                        if not test:
-                            # move card to 'Ready to Go'
-                            cardsObj.moveCardToList(card['id'], 'Ready to go')
+                        # move card to 'Ready to Go'
+                        cardsObj.moveCardToList(card['id'], 'Ready to go')
             else:
                 print ('Skipping as no type: {}'.format(card['name']))
+
             

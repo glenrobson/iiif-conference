@@ -1,9 +1,8 @@
-#!/usr/bin/python
+#!/usr/bin/env python3
 
 import json
-import trello
 import requests
-import users
+from . import users, trello, config
 import re
 
 class Cards:
@@ -14,6 +13,8 @@ class Cards:
         self.security = trello.getSecurity()
         self.lists = lists
         self.labels = labels 
+        conf = config.Config()
+        self.board_id = conf.board_id
 
     def getCardsForUserFromBoard(self, user, boardId):
         url = 'https://api.trello.com/1/boards/{}/cards{}'.format(boardId, self.security)
@@ -27,13 +28,44 @@ class Cards:
         return userCards        
 
     def getCardsFromLists(self, lists):
+        allCards = []
+        for listName in lists:
+            allCards += self.getCardsFromList(listName)
+
+        return allCards    
+            
+    def getCardsFromList(self, listName):
+        url = 'https://api.trello.com/1/lists/{}/cards{}'.format(self.lists[listName.encode('utf-8')], self.security)
+        return requests.get(url).json()
+
+    def getCardsFromLabel(self, label, boardId):
+        url = 'https://api.trello.com/1/search{}'.format(self.security)
+
+        query = 'label:"{}" '.format(label)
+
+        querystring = {
+            "query":query,
+            "idBoards":boardId,
+            "card_fields":"all",
+            "cards_limit":"100",
+            "cards_page":"0"
+        }
+        return requests.request("GET", url, params=querystring).json()['cards']
+
+    def getCardsFromLabels(self, labels, boardId):
         cards = []
-        for trelloList in lists:
-            url = 'https://api.trello.com/1/lists/{}/cards{}'.format(self.lists[trelloList], self.security)
-            listCards = requests.get(url).json()
-            cards.extend(listCards)
-                
-        return cards            
+        for label in labels:
+            cards += self.getCardsFromLabel(label,boardId)
+        return cards        
+
+   # def getCardsFromLists(self, lists):
+   #     cards = []
+   #     for trelloList in lists:
+   #         url = 'https://api.trello.com/1/lists/{}/cards{}'.format(self.lists[trelloList.encode('utf-8')], self.security)
+   #         listCards = requests.get(url).json()
+   #         cards.extend(listCards)
+   #             
+   #     return cards            
 
     def getCard(self, cardId, user=None):
         url = 'https://api.trello.com/1/cards/{}{}'.format(cardId, self.security)
@@ -85,6 +117,29 @@ class Cards:
                 url = "https://api.trello.com/1/cards/{}{}&idList={}".format(cardId, self.security, self.lists[decision])
                 response = requests.request("PUT", url)
 
+    def addComment(self, cardId, comment):
+        url = "https://api.trello.com/1/cards/{}/actions/comments{}".format(cardId, self.security)
+        querystring = {"text":comment}
+        response = requests.request("POST", url, params=querystring)
+        
+    def addList(self, listName):
+        if listName.encode('utf-8') not in self.lists:
+            url = "https://api.trello.com/1/lists{}&name={}&idBoard={}&pos=bottom".format(self.security, listName, self.board_id)
+            response = requests.request("POST", url).json()
+            # {"id":"5e55aecef6e56b8dff840794","name":"test list","closed":false,"idBoard":"5e45bec960c5af7dbe375164","pos":475135,"limits":{}}
+            self.lists[response['name'].encode('utf-8')] = response['id']
+            return response['id']
+        else:
+            return self.lists[listName.encode('utf-8')]
+
+    def moveCardToList(self, cardId, listName):
+        if listName.encode('utf-8') not in self.lists:
+            list_id = self.addList(listName)
+        else:
+            list_id = self.lists[listName.encode('utf-8')]
+            
+        url = "https://api.trello.com/1/cards/{}{}&idList={}".format(cardId, self.security, list_id)
+        response = requests.request("PUT", url)
 
     def assignCard(self, userId, cardId):
         # First remove all other assigned users
@@ -180,7 +235,7 @@ def decodeReview(text):
 
 def decodeCard(card):
     cardData = {
-        'id': re.findall(r"^[0-9]+", card['name'])[0],
+        'id': int(re.findall(r"^[0-9]+", card['name'])[0]),
         'title': re.sub(r"^[0-9]+. (.*) by .*$", r"\1", card['name'])
     }
     cardData['flagged'] = False
@@ -216,14 +271,20 @@ def decodeCard(card):
             elif mode == 'Author' and line.startswith('- '):    
                 if 'authors' not in cardData:
                     cardData['authors'] = []
-                
+                authorText = line[2:] 
+                link = ''
+                if authorText.startswith('['):
+                    # this is a link in the form [name, company, location](url)
+                    link = re.sub(r'^\[.*\]\((.*)\)',r'\1', authorText)
+                    authorText = re.sub(r'^\[(.*)\]\(.*$',r'\1', authorText)
                 author = {
-                    'name': line[2:].split(',')[0],
-                    'company': line.split(', ')[1],
+                    'name': authorText.split(',')[0],
+                    'company': authorText.split(', ')[1],
                 }
                 if len(line.split(', ')) > 2:
-                    author['location'] = line.split(', ')[2]
-
+                    author['location'] = authorText.split(', ')[2]
+                if link:
+                    author['link'] = link
                 cardData['authors'].append(author)
             elif mode == 'Comment' and len(line.strip()) > 0:
                 if 'comments' not in cardData:
@@ -232,10 +293,10 @@ def decodeCard(card):
                     cardData['comments'] += line
 
             elif mode == 'Topic' and line.startswith('- '):    
-                if 'topic' not in cardData:
-                    cardData['topic'] = [ line[2:] ]
+                if 'topics' not in cardData:
+                    cardData['topics'] = [ line[2:] ]
                 else:
-                    cardData['topic'].append(line[2:])
+                    cardData['topics'].append(line[2:])
 
             elif mode == 'Abstract':
                 if 'abstract' not in cardData:
@@ -243,7 +304,7 @@ def decodeCard(card):
                 else:
                     cardData['abstract'] += line + '\n'
                     
-    cardData['abstract'] = '<p>{}</p>'.format(cardData['abstract'].encode('utf-8').replace("\n\n","</p><p>"))
+    cardData['abstract'] = '<p>{}</p>'.format(cardData['abstract'].replace("\n\n","</p><p>"))
     return cardData
 
 if __name__ == "__main__":
