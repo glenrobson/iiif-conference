@@ -10,6 +10,10 @@ from model.config import Config
 import yaml
 import sys
 
+def removeIfPresent(key, listsList):
+    if key in listsList:
+        listsList.remove(key)
+
 if __name__ == "__main__":
     conf = Config()
     board_id = conf.board_id
@@ -18,19 +22,17 @@ if __name__ == "__main__":
     labels = boards.getLabels(board_id)
 
     cardsObj = cards.Cards(lists, labels)
-    # Acceptance process build draft program
-    if 'Strong Accept' in lists:
-        acceptedCards = cardsObj.getCardsFromLists(['Strong Accept', 'Accept', 'Weak Accept', 'Borderline Paper']) 
-    # Acceptance email gone. Ongoing contact work to get to approval    
-    elif 'Questions on acceptance':    
-        acceptedCards = cardsObj.getCardsFromLists(['Questions on acceptance','Scheduling', 'Needs work', 'Ready to go','Program Ready']) 
-    # Final state, cleaning up last stragglers     
-    else:    
-        acceptedCards = cardsObj.getCardsFromLists(['Scheduling', 'Needs work', 'Ready to go','Program Ready']) 
+    listsToProcess = lists.keys()
+
+    removeIfPresent('Rejected', listsToProcess)
+    removeIfPresent('Reject', listsToProcess)
+    removeIfPresent('Weak Reject', listsToProcess)
+
+    acceptedCards = cardsObj.getCardsFromLists(listsToProcess) 
 
     outputList = []
     for card in acceptedCards:
-        cardData = cards.decodeCard(card)
+        cardData = cardsObj.decodeCard(card)
         # Remove private submission related data:
         cardData.pop('comments', None)
         cardData.pop('contact', None)

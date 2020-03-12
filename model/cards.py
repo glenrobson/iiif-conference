@@ -7,8 +7,12 @@ import re
 
 class Cards:
     security = ''
+    # Hash table { 'listName' => 'list_id' }
     lists = {}
+    # Hash table { 'label' => 'label_id' }
     labels = {}
+    presentationTypes = ['Workshop', 'Lightning talk', 'Panel', 'Presentation']
+
     def __init__(self, lists, labels):
         self.security = trello.getSecurity()
         self.lists = lists
@@ -30,12 +34,14 @@ class Cards:
     def getCardsFromLists(self, lists):
         allCards = []
         for listName in lists:
-            allCards += self.getCardsFromList(listName)
+            listCards = self.getCardsFromList(listName)
+            print ('Got {} cards from {}'.format(len(listCards), listName))
+            allCards += listCards
 
         return allCards    
             
     def getCardsFromList(self, listName):
-        url = 'https://api.trello.com/1/lists/{}/cards{}'.format(self.lists[listName.encode('utf-8')], self.security)
+        url = 'https://api.trello.com/1/lists/{}/cards{}'.format(self.lists[listName], self.security)
         return requests.get(url).json()
 
     def getCardsFromLabel(self, label, boardId):
@@ -123,20 +129,20 @@ class Cards:
         response = requests.request("POST", url, params=querystring)
         
     def addList(self, listName):
-        if listName.encode('utf-8') not in self.lists:
+        if listName not in self.lists:
             url = "https://api.trello.com/1/lists{}&name={}&idBoard={}&pos=bottom".format(self.security, listName, self.board_id)
             response = requests.request("POST", url).json()
             # {"id":"5e55aecef6e56b8dff840794","name":"test list","closed":false,"idBoard":"5e45bec960c5af7dbe375164","pos":475135,"limits":{}}
-            self.lists[response['name'].encode('utf-8')] = response['id']
+            self.lists[response['name']] = response['id']
             return response['id']
         else:
-            return self.lists[listName.encode('utf-8')]
+            return self.lists[listName]
 
     def moveCardToList(self, cardId, listName):
-        if listName.encode('utf-8') not in self.lists:
+        if listName not in self.lists:
             list_id = self.addList(listName)
         else:
-            list_id = self.lists[listName.encode('utf-8')]
+            list_id = self.lists[listName]
             
         url = "https://api.trello.com/1/cards/{}{}&idList={}".format(cardId, self.security, list_id)
         response = requests.request("PUT", url)
@@ -203,6 +209,33 @@ class Cards:
                 
         return userCards
 
+    def getCardsByType(self, board_id, types=None, include=None, exclude=None):    
+        lists = self.lists
+        if include:
+            lists = include
+
+        if exclude:    
+            lists = lists.copy()
+            for value in exclude:
+                del lists[value]
+
+        if not types:
+            types = self.labels
+
+        results = {} 
+        for listName in lists:
+            for card in self.getCardsFromList(listName):
+                print ('Getting card {}'.format(card['name']))
+                for label in card['labels']:
+                    print ('Is label {} in card {}'.format(label['name'], types))
+                    if label['name'] in types:
+                        if label['name'] not in results:
+                            results[label['name']] = []
+                        results[label['name']].append(card)
+
+        return results            
+        
+
     def printResponse(self, response):
         if response.status_code != 200:
             print (response.text)
@@ -220,6 +253,81 @@ class Cards:
                     reviews.append(comment)
         return reviews        
 
+    def decodeCard(self, card):
+        cardData = {
+            'id': int(re.findall(r"^[0-9]+", card['name'])[0]),
+            'title': re.sub(r"^[0-9]+. (.*) by .*$", r"\1", card['name'])
+        }
+        cardData['flagged'] = False
+        for label in card['labels']:
+            if label['name'] == 'Flagged':
+                cardData['flagged'] = True
+            else:
+                if label['name'] in self.presentationTypes:
+                    cardData['type'] = label['name']
+        mode = ""        
+        for line in card['desc'].splitlines():
+            if line == '**Contact**':
+                mode = 'Contact'
+            elif line == '**Authors**':
+                mode = 'Author'
+            elif line == '**Comments**':
+                mode = 'Comment'
+            elif line == '**Topics**':
+                mode = 'Topic'
+            elif line.startswith('**Keywords:**'):
+                cardData['keywords'] = []
+                for keyword in line[14:].split(','):
+                    cardData['keywords'].append(keyword.strip())
+
+            elif line == '**Abstract:**':
+                mode = 'Abstract'
+            else:
+                #print ('mode {} line "{}" '.format(mode, line))
+                if mode == 'Contact' and line.startswith(' - '):
+                    cardData['contact'] = {
+                        'name': line[3:].split(',')[0],
+                        'email': line.split(', ')[1]
+                    }
+                elif mode == 'Author' and line.startswith('- '):    
+                    if 'authors' not in cardData:
+                        cardData['authors'] = []
+                    authorText = line[2:] 
+                    link = ''
+                    if authorText.startswith('['):
+                        # this is a link in the form [name, company, location](url)
+                        link = re.sub(r'^\[.*\]\((.*)\)',r'\1', authorText)
+                        authorText = re.sub(r'^\[(.*)\]\(.*$',r'\1', authorText)
+                    author = {
+                        'name': authorText.split(',')[0],
+                        'company': authorText.split(', ')[1],
+                    }
+                    if len(line.split(', ')) > 2:
+                        author['location'] = authorText.split(', ')[2]
+                    if link:
+                        author['link'] = link
+                    cardData['authors'].append(author)
+                elif mode == 'Comment' and len(line.strip()) > 0:
+                    if 'comments' not in cardData:
+                        cardData['comments'] = line
+                    else:
+                        cardData['comments'] += line
+
+                elif mode == 'Topic' and line.startswith('- '):    
+                    if 'topics' not in cardData:
+                        cardData['topics'] = [ line[2:] ]
+                    else:
+                        cardData['topics'].append(line[2:])
+
+                elif mode == 'Abstract':
+                    if 'abstract' not in cardData:
+                        cardData['abstract'] = line + '\n'
+                    else:
+                        cardData['abstract'] += line + '\n'
+                        
+        cardData['abstract'] = '<p>{}</p>'.format(cardData['abstract'].encode('utf8').replace("\n\n","</p><p>"))
+        return cardData
+
 def encodeReview(user, decision, comment):
     return 'Review:\nReviewer: {}\nDecision: {}\nComment:{}'.format(user['fullName'],decision, comment) 
 
@@ -233,79 +341,7 @@ def decodeReview(text):
 
     return (lines[1].split(':')[1].strip(), lines[2].split(':')[1].strip(), comment)
 
-def decodeCard(card):
-    cardData = {
-        'id': int(re.findall(r"^[0-9]+", card['name'])[0]),
-        'title': re.sub(r"^[0-9]+. (.*) by .*$", r"\1", card['name'])
-    }
-    cardData['flagged'] = False
-    for label in card['labels']:
-        if label['name'] == 'Flagged':
-            cardData['flagged'] = True
-        else:
-            cardData['type'] = label['name']
-    mode = ""        
-    for line in card['desc'].splitlines():
-        if line == '**Contact**':
-            mode = 'Contact'
-        elif line == '**Authors**':
-            mode = 'Author'
-        elif line == '**Comments**':
-            mode = 'Comment'
-        elif line == '**Topics**':
-            mode = 'Topic'
-        elif line.startswith('**Keywords:**'):
-            cardData['keywords'] = []
-            for keyword in line[14:].split(','):
-                cardData['keywords'].append(keyword.strip())
 
-        elif line == '**Abstract:**':
-            mode = 'Abstract'
-        else:
-            #print ('mode {} line "{}" '.format(mode, line))
-            if mode == 'Contact' and line.startswith(' - '):
-                cardData['contact'] = {
-                    'name': line[3:].split(',')[0],
-                    'email': line.split(', ')[1]
-                }
-            elif mode == 'Author' and line.startswith('- '):    
-                if 'authors' not in cardData:
-                    cardData['authors'] = []
-                authorText = line[2:] 
-                link = ''
-                if authorText.startswith('['):
-                    # this is a link in the form [name, company, location](url)
-                    link = re.sub(r'^\[.*\]\((.*)\)',r'\1', authorText)
-                    authorText = re.sub(r'^\[(.*)\]\(.*$',r'\1', authorText)
-                author = {
-                    'name': authorText.split(',')[0],
-                    'company': authorText.split(', ')[1],
-                }
-                if len(line.split(', ')) > 2:
-                    author['location'] = authorText.split(', ')[2]
-                if link:
-                    author['link'] = link
-                cardData['authors'].append(author)
-            elif mode == 'Comment' and len(line.strip()) > 0:
-                if 'comments' not in cardData:
-                    cardData['comments'] = line
-                else:
-                    cardData['comments'] += line
-
-            elif mode == 'Topic' and line.startswith('- '):    
-                if 'topics' not in cardData:
-                    cardData['topics'] = [ line[2:] ]
-                else:
-                    cardData['topics'].append(line[2:])
-
-            elif mode == 'Abstract':
-                if 'abstract' not in cardData:
-                    cardData['abstract'] = line + '\n'
-                else:
-                    cardData['abstract'] += line + '\n'
-                    
-    cardData['abstract'] = '<p>{}</p>'.format(cardData['abstract'].replace("\n\n","</p><p>"))
-    return cardData
 
 if __name__ == "__main__":
     cards = Cards({

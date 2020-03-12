@@ -112,12 +112,12 @@ Once all of the submissions have been reviewed the PC meets to discuss any submi
 
  * Cards in `Strong Accept`, `Accept`, `Weak Accept` or `Borderline Paper` and that aren't flagged should be ready to go and OK to be automatically contacted to say their submission has been accepted. 
  * Any cards in `Weak Reject` and `Reject` will have to be manually contacted to say why their submission were rejected. 
- * Any cards that shouldn't be automaticlly contacted should be flagged. These cards will need a manual email. 
+ * Any cards that shouldn't be automatically contacted should be flagged. These cards will need a manual email. 
 
 Cards that need to be handled manually should have a comment to say why.
 
 ## Stage 4: Notification of acceptance
-Now all of the submissions have been reviewed we are ready to notify the authors if they have been succesful. As part of this process we also want to get authors to approve their submission on the website and correct any errors that were flagged in the review. The first stage is to deploy the approved submissions to the IIIF website.
+Now all of the submissions have been reviewed we are ready to notify the authors if they have been successful. As part of this process we also want to get authors to approve their submission on the website and correct any errors that were flagged in the review. The first stage is to deploy the approved submissions to the IIIF website.
 
 ### Building the IIIF conference submissions website
 This is done by converting the Trello cards into a YAML file that can be shown on the IIIF Jekyll website. To do this run the following script:
@@ -201,6 +201,10 @@ Corrections can be made by directly editing the trello cards. Progress can be mo
 For the flagged submissions created in the previous stage and there should be an email in `/tmp/flagged` for this submission. Flagged submissions will be deployed to the website so that it can be shared with authors and they can see the changes that need to be made. 
 
 These flagged submissions will have to be contacted manually. If there are changes these can be done using Trello and once fixed cards can be moved to 'ready to go'
+
+
+## Stage 6: Building the program
+This work is mostly done in the [IIIF Jekyll site](https://github.com/IIIF/website) and involves grouping presentations around a theme and fitting them into the program. To help with this work there is an Admin function that will list all accepted presentations by type.
 
 # Running locally with python
 

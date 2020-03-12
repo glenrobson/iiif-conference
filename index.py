@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python3
 import sys
 import json
 import os
@@ -28,7 +28,7 @@ labels = boards.getLabels(board_id)
 users.createUserFile(board_id)
 boardUsers = users.getUsers(board_id)
 
-cards  = cards.Cards(lists, labels)
+cardsObj  = cards.Cards(lists, labels)
 
 @post('/review/<cardId>.html')
 def saveReview(cardId):
@@ -44,7 +44,7 @@ def saveReview(cardId):
     #print ('Flagged: {} form: {}'.format(flagged, request.forms.get('flag')))
     #print (request.forms)
 
-    cards.review(user, cardId, decisionMap[int(decision)], comment, flagged)
+    cardsObj.review(user, cardId, decisionMap[int(decision)], comment, flagged)
 
     redirect('../index.html')
 
@@ -52,7 +52,7 @@ def saveReview(cardId):
 def review(cardId):
     aaa.require(fail_redirect='/login.html')
     user = boardUsers[aaa.current_user.username]
-    data = cards.getCard(cardId, user)
+    data = cardsObj.getCard(cardId, user)
 
     #print (json.dumps(data,indent=4))
     output = template('views/showCard.tpl', card=data, user=user, decisions=decisionMap, role=aaa.current_user.role)
@@ -70,7 +70,7 @@ def showAssignment():
     aaa.require(fail_redirect='/login.html')
     aaa.require(role='admin', fail_redirect='/index.html')      
 
-    data = cards.getCardsByUser(board_id)
+    data = cardsObj.getCardsByUser(board_id)
 
     return template('views/admin/cardsByUser.tpl', data= data, role=aaa.current_user.role, lists=idLists)
 @post('/admin/assignCard')
@@ -79,7 +79,7 @@ def assignCard():
     aaa.require(role='admin', fail_redirect='/index.html')      
 
     data = request.json
-    results = cards.assignCard(data['user_id'], data['card_id'])
+    results = cardsObj.assignCard(data['user_id'], data['card_id'])
     response.content_type = 'application/json'
     return json.dumps(results)
 
@@ -96,7 +96,7 @@ def showCards():
     aaa.require(role='admin', fail_redirect='/index.html')      
 
     response.content_type = 'application/json'
-    data = cards.getCardsByUser(board_id)
+    data = cardsObj.getCardsByUser(board_id)
     return json.dumps(data)
 
 @route('/admin/users.json')
@@ -108,13 +108,21 @@ def showUsers():
     data = users.getUsers(board_id)
     return json.dumps(data)
 
+@route('/admin/proposalTypes.html')
+def showProposalsByType():
+    aaa.require(fail_redirect='/login.html')
+    user = boardUsers[aaa.current_user.username]
+    aaa.require(role='admin', fail_redirect='/index.html')      
+
+    data = cardsObj.getCardsByType(board_id, types=cardsObj.presentationTypes, exclude=['Rejected', 'Inbox'])
+    return template('views/admin/proposalTypes.tpl', data=data, user=user, role=aaa.current_user.role, lists=idLists, cardsObj=cardsObj)
     
 @route('/index.html')
 @route('/')
 def showIndex():
     aaa.require(fail_redirect='/login.html')
     user = boardUsers[aaa.current_user.username]
-    data = cards.getCardsForUserFromBoard(user, board_id)
+    data = cardsObj.getCardsForUserFromBoard(user, board_id)
 
     #print (json.dumps(data,indent=4))
     output = template('views/showSubmissions.tpl', cardsJson=data, user=user, role=aaa.current_user.role, lists=idLists)
@@ -133,6 +141,7 @@ def login():
     """Authenticate users"""
     username = request.forms.get('username')
     password = request.forms.get('password')
+    print ('User {} pass {}'.format(username, password))
     aaa.login(username, password, success_redirect='/', fail_redirect='/login.html')
 
 @get('/login.html')
