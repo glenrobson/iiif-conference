@@ -21,7 +21,7 @@ def getUsers(boardId):
     usersJson = requests.get(url).json()
     users  = {}
     for trelloUser in usersJson:
-        users[trelloUser['username'].encode('ascii','replace')] = trelloUser
+        users[trelloUser['username']] = trelloUser
 
     return users
 
@@ -30,7 +30,7 @@ def getUsersById(boardId):
     usersJson = requests.get(url).json()
     users  = {}
     for trelloUser in usersJson:
-        users[trelloUser['id'].encode('ascii','replace')] = trelloUser
+        users[trelloUser['id']] = trelloUser
 
     return users
 
@@ -42,12 +42,13 @@ def createUserFile(board_id):
     with open('./conf/users.json', 'w') as outfile:
         json.dump(users_json, outfile)
     aaa = Cork('conf')
+    print ('Preferred algorithum {}'.format(aaa.preferred_hashing_algorithm))
     for user in users.values():
         role = 'user'
         if user['username'] in ['glenrobson2','joshhadro2']:
             role = 'admin'
         user_json = {
-            'hash': aaa._hash(user['username'], user['fullName'].split(' ')[0]),
+            'hash': aaa._hash(user['username'], user['fullName'].split(' ')[0]).decode("utf-8"),
             'desc': user['fullName'],
             'role': role,
             'email_addr': ''

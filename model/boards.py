@@ -12,7 +12,7 @@ def getLists(boardId):
     nameList = {}
     idList = {}
     for trelloList in listsJson:
-        nameList[trelloList['name'].encode('ascii','replace')] = trelloList['id']
+        nameList[trelloList['name']] = trelloList['id']
         idList[trelloList['id']] = trelloList['name']
 
     return (nameList, idList) # return lists both ways, one with name as key and one id as a key

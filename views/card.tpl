@@ -22,7 +22,7 @@
     % for card in cardsJson:
     <tr>
         <%
-            cardName = card['name'].encode("utf-8")
+            cardName = card['name']
             number = cardName.split('.')[0]
             endPart = cardName.split('{}. '.format(number))[1]
             title = ' by '.join(endPart.split(' by ')[0:-1])
