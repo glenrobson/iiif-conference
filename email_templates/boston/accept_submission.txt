@@ -8,7 +8,7 @@ Your proposal has been accepted and we look forward to hearing your talk at the 
 
 We will publish the information you submitted in the proposal to the conference website and we would be grateful if you could let us know of any changes that are required to the following before the 13th of March:
 
-{{ paper['url'] }}
+https://preview.iiif.io/root/boston_program/event/2020/boston/program/{{ paper['id'] }}/ 
 
 Information on the conference including how to register can be found on the iiif.io website:
 

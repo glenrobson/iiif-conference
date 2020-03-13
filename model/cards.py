@@ -325,7 +325,7 @@ class Cards:
                     else:
                         cardData['abstract'] += line + '\n'
                         
-        cardData['abstract'] = '<p>{}</p>'.format(cardData['abstract'].encode('utf8').replace("\n\n","</p><p>"))
+        cardData['abstract'] = '<p>{}</p>'.format(cardData['abstract'].replace("\n\n","</p><p>"))
         return cardData
 
 def encodeReview(user, decision, comment):

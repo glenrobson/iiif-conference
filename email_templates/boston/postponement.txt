@@ -1,0 +1,20 @@
+Dear {{ paper['name'] }},
+
+Given the global health concerns surrounding Covid-19, we have made the difficult decision to postpone the IIIF Annual Conference, scheduled to take place in Boston from June 1-4, 2020. We will communicate as soon as we can about when we expect to be able to hold this event safely. In the meantime, we are exploring virtual options in order to continue providing opportunities to share and learn from the IIIF community’s extensive experience and output.
+
+We reached this decision in collaboration with our local hosts, Harvard and MIT, and based on reports from institutions around the world that have restricted travel for the foreseeable future. Given the trajectory of news in recent days and hours, it is clear that the most ethical course of action is to postpone large in-person gatherings. We encourage you to review updates and guidelines from global health authorities such as the World Health Organization (WHO), the US Centers for Disease Control (CDC), as well as state and local authorities.
+
+We are immensely grateful for the efforts members of the IIIF community have already poured into preparing for the conference, including submitting proposals, evaluating program guidelines and submissions, and planning for on-the-ground logistics. We apologize for the disruption this may cause, and we appreciate your understanding as we keep the best interest of the community in mind.
+
+Regarding the submissions already accepted, we will be in contact with updated plans as the situation develops. If the conference is rescheduled in 2020 we may carry over the program, but if this is not possible we may ask you to present in a virtual event. 
+
+If you have any questions, please get in touch with us via events@iiif.io.
+
+Yours sincerely,
+
+IIIF-C staff and Local Planning Committee
+
+WHO Coronavirus information: https://www.who.int/emergencies/diseases/novel-coronavirus-2019
+CDC advice: https://www.cdc.gov/coronavirus/2019-ncov/index.html
+
+

@@ -8,7 +8,7 @@ sys.path.insert(0,parentdir)
 
 import sys
 from model import cards, boards, emailhelper
-from bottle import template
+from bottle import template, SimpleTemplate
 import io
 import json
 from model.config import Config
@@ -29,7 +29,7 @@ if __name__ == "__main__":
         acceptedCards = cardsObj.getCardsFromLists(['Ready to go']) 
         # for each submission
         for card in acceptedCards:
-            cardData = cards.decodeCard(card)
+            cardData = cardsObj.decodeCard(card)
             #print (json.dumps(cardData, indent=4))
             if 'type' in cardData and cardData['type'] != 'Workshop': # and cardData['id'] in [-1,0]:
                 print ('Processing: Card: {}, type: {}'.format(cardData['id'], cardData['type']))
@@ -85,38 +85,39 @@ if __name__ == "__main__":
                         # move card to 'Ready to Go'
                         cardsObj.moveCardToList(card['id'], 'Program Ready')
 
-    if type == 'accept_submission':
+    if type == 'config':
+        messageConfig = conf.email_template_config(sys.argv[2])
         # Get all submissions which are Strong Accept, Accept, Weak Accept, Borderline Paper
-        acceptedCards = cardsObj.getCardsFromLists(['Strong Accept', 'Accept', 'Weak Accept', 'Borderline Paper']) 
+        acceptedCards = cardsObj.getCardsFromLists(messageConfig['lists']) 
 
         # for each submission
         for card in acceptedCards:
-            cardData = cards.decodeCard(card)
+            cardData = cardsObj.decodeCard(card)
             if 'type' in cardData:
                 # Create email card data
                 emailData = {
                     'id': cardData['id'],
                     'name': cardData['contact']['name'],
                     'title': cardData['title'],
-                    'type': cardData['type'],
-                    'url': conf.email_template_config('accept_submission')['preview'].format(cardData['id'])
+                    'type': cardData['type']
                 }
 
                 emailClient = emailhelper.createEmailClient(gmail=True)
 
-                fromAddr = conf.email_template_config('accept_submission')['from']
+                fromAddr = messageConfig['from']
                 # get contact email address
                 if test:
                     to = 'glen.robson@gmail.com'
                 else:
                     to = cardData['contact']['email']
 
-                subject = template(conf.email_template_config('accept_submission')['subject'], paper=emailData)
+                tpl = SimpleTemplate(messageConfig['subject'])
+                subject = tpl.render(paper=emailData)
 
                 # create populated email template
-                text = template(conf.email_template_config('accept_submission')['text'], paper=emailData)
+                text = template(messageConfig['text'], paper=emailData)
 
-                if cardData['flagged']:
+                if cardData['flagged'] and messageConfig['includeFlagged'] == 'false':
                     tmp_dir = "/tmp/flagged"
                     filename = "{}/{}.txt".format(tmp_dir, cardData['id'])
                     if not os.path.exists(tmp_dir):
@@ -149,8 +150,7 @@ if __name__ == "__main__":
                         cardsObj.addComment(card['id'], comment)
                     else:    
                         # move card to 'Ready to Go'
-                        cardsObj.moveCardToList(card['id'], 'Ready to go')
+                        if 'destination_list' in messageConfig and messageConfig['destination_list']:
+                            cardsObj.moveCardToList(card['id'], messageConfig['destination_list'])
             else:
-                print ('Skipping as no type: {}'.format(card['name']))
-
-            
+                print ('Skipping as no type: {}'.format(card['name']))        

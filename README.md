@@ -151,23 +151,25 @@ Once you have the page_gen files and submissions yaml in place you can create a 
 The evaluation stage will leave cards in the lists stated above (`Strong Accept` etc) and some will be flagged for further discussion. The script:
 
 ```
-./scripts/notifications.py accept_submission
+./scripts/notifications.py config accept_submission
 ```
 
 Will email all authors of submissions in the `Strong Accept`, `Accept`, `Weak Accept` and `Borderline Paper` categories that aren't flagged that their submission has been accepted. If the email sends successfully then the cards will be moved to a `Ready to go` list. Any flagged submissions are not emailed but a copy of the email is placed in `/tmp/flagged` so that it can be used to manually email authors.
 
 The email uses a google mail account and you will have to download a credentials.json file from google by registering for a [GMail API key](https://developers.google.com/gmail/api/quickstart/python). On first run of the notifications script you will be asked to authorise the script to send emails using your google account.  
 
-To set the text of the message set the following property in the config under `email_templates`. You can also set the preview URL for the submission details under the website part of the config:
+To set the text of the message set the following property in the config under `email_templates`:
 
 ```
     "email_templates": {
         "account_info": "email_templates/boston/account_info.txt",
         "accept_submission": {
+            "lists": ["Strong Accept", "Accept", "Weak Accept", "Borderline Paper"],
+            "includeFlagged": "false",
             "from": "events@iiif.io",
             "subject": "Submission {{ paper['id'] }}: 2020 IIIF Boston Conference",
             "text": "email_templates/boston/accept_submission.txt",
-            "preview": "https://preview.iiif.io/root/boston_program/event/2020/boston/program/{}/"
+            "destination_list": "Ready to go"
         }
     }
 ```
@@ -202,9 +204,51 @@ For the flagged submissions created in the previous stage and there should be an
 
 These flagged submissions will have to be contacted manually. If there are changes these can be done using Trello and once fixed cards can be moved to 'ready to go'
 
-
 ## Stage 6: Building the program
 This work is mostly done in the [IIIF Jekyll site](https://github.com/IIIF/website) and involves grouping presentations around a theme and fitting them into the program. To help with this work there is an Admin function that will list all accepted presentations by type.
+
+
+# Other tips
+
+## Sending emails to submitters
+
+This works in a similar way to how notifications work and can be configured using the following configuration:
+
+```
+    "email_templates": {
+        "postponement": {
+            "lists": ["Strong Accept", "Accept", "Weak Accept", "Borderline Paper","Ready to go", "Questions on acceptance", "Scheduling", "Needs work"],
+            "includeFlagged": "true",
+            "from": "events@iiif.io",
+            "subject": "IIIF Annual Conference Postponed due to COVID-19 (coronavirus)",
+            "text": "email_templates/boston/postponement.txt",
+            "destination_list": "contacted"
+        }
+    }        
+```
+
+The config options available are:
+
+ * `lists`: Trello lists to retrieve the card information from. 
+ * `includeFlagged`: whether to include flagged submissions in the communication. You may choose `true` if its an email to all submitters but `false` if you want to email flagged submissions a separate email.
+ * `from`: who the email is from. You must have permission to use this email address. 
+ * `subject`: Subject of the email and you can use bottle markup.
+ * `text`: link to the Bottle template for this email message
+ * `destination_list`: the list that cards should be moved to if successfully contacted. Don't include this field if you don't want the card to be moved.
+
+The subject and text of the email message users the `bottle` template format and the following details can be substituted:
+
+ * `{{ paper['id'] }}`:  The id for the submission usually a running number starting from the first submission
+ * `{{ paper['name']}}`: Name of the submissions submitter
+ * `{{ paper['title'] }}`: Title of the submission
+ * `{{ paper['type'] }}`: Type of submission e.g. Presentation / Lightning talk / Panel
+ * `{{ paper['url'] }}`: The URL to the submission details on the preview website. This is set in the config above with `{}` which is replaced by the paper id.
+
+To send the emails use the following script:
+
+```
+./scripts/notifications.py config postponement
+```
 
 # Running locally with python
 

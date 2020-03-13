@@ -7,10 +7,19 @@
     "email_templates": {
         "account_info": "email_templates/boston/account_info.txt",
         "accept_submission": {
+            "lists": ["Strong Accept", "Accept", "Weak Accept", "Borderline Paper"],
+            "includeFlagged": "false",
             "from": "events@iiif.io",
             "subject": "Submission {{ paper['id'] }}: 2020 IIIF Boston Conference",
             "text": "email_templates/boston/accept_submission.txt",
-            "preview": "https://preview.iiif.io/root/boston_program/event/2020/boston/program/{}/"
+            "destination_list": "Ready to go"
+        },
+        "postponement": {
+            "lists": ["Strong Accept", "Accept", "Weak Accept", "Borderline Paper","Ready to go", "Questions on acceptance", "Scheduling", "Needs work"],
+            "includeFlagged": "true",
+            "from": "events@iiif.io",
+            "subject": "IIIF Annual Conference Postponed due to COVID-19 (coronavirus)",
+            "text": "email_templates/boston/postponement.txt"
         }
     }
 }
