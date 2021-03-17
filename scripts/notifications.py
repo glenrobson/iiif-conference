@@ -154,3 +154,7 @@ if __name__ == "__main__":
                             cardsObj.moveCardToList(card['id'], messageConfig['destination_list'])
             else:
                 print ('Skipping as no type: {}'.format(card['name']))        
+
+            if test:
+                print ('As this is a test I am now exiting')
+                break
