@@ -1,0 +1,11 @@
+Dear {{ paper['name'] }},
+
+We contacted you in March to say that the 2020 Annual IIIF conference we intended to hold in Boston in June 2020 was being postponed due to covid-19. We let you know that we were waiting for more information as to when we might be able to reschedule the event; it is now clear that it won’t be possible to hold the event this year and that the earliest potential date is late Spring or Summer of 2021. Given that the rescheduled conference will be at least a year after the initial call for proposals we have decided to issue a new call for proposals for the rescheduled Boston conference. We will send details to the iiif-discuss list as soon as we have more details on exactly when the Conference will happen. 
+
+In the meantime, we are hoping to feature some of the proposed work on upcoming Community Calls where possible over the coming months, though we can’t guarantee that everything will fit into one of these calls.  
+
+Thank you again for your submissions and please look out on the iiif-discuss email list for announcement of the new call for proposals.
+
+Josh, Meg and Glen, IIIF-C Staff
+
+Join the iiif-discuss email list: https://groups.google.com/forum/#!forum/iiif-discuss
