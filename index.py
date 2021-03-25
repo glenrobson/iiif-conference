@@ -218,7 +218,7 @@ def login():
         redirect('/') 
         
     """Authenticate users"""
-    oauth = OAuth1Session(client_id, client_secret=client_secret, callback_uri='http://0.0.0.0:9000/callback')
+    oauth = OAuth1Session(client_id, client_secret=client_secret, callback_uri='https://conference.iiif.io/callback')
     fetch_response = oauth.fetch_request_token('https://trello.com/1/OAuthGetRequestToken')
     session['tmp_oauth_token'] = fetch_response.get('oauth_token')
     session['tmp_oauth_secret'] = fetch_response.get('oauth_token_secret')
