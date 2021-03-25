@@ -13,7 +13,7 @@ else:
     from model import trello, users
     from model.config import Config
 
-from bottle import request
+from bottle import request,redirect
 
 def storeCurrentUser(boardId):
     user = users.getCurrentUser()
