@@ -1,4 +1,5 @@
 .DS_Store
+_session
 .apikeys
 credentials.json
 token.pickle
