@@ -12,6 +12,11 @@
         <ul>
             <li><a href="/admin/proposalTypes.html">Proposals by Type</a></li>
         </ul>    
+        <h2>Setup</h2>
+        <ul>
+            <li><a href="/admin/setupLabels.html">Edit Proposal Types</a></li>
+            <li><a href="/admin/setupLists.html">Lists Setup</a></li>
+        </ul>    
       </div>
     </main>
 <% include('views/footer.tpl') %>

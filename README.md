@@ -1,9 +1,26 @@
 # iiif-conference
 Conference Submission review system using trello as a backend. The main part of this system is reviewing submissions but it also has helper functions to manage the process from submission to publication of the program. Configuration and setup instructions are below organised by process stage.
 
-A lot of the configuration per conference is stored in a configuration file. See [boston.conf](conf/boston.json) for a complete example. Details of the different fields are detailed below as they are needed
+A lot of the configuration per conference is stored in a configuration file. See [boston.conf](conf/boston.json) for a complete example. Details of the different fields are detailed below as they are needed. 
 
 ## Stage 1: Submission
+
+### Config
+
+At this point you need to setup the basic config as follows:
+
+```
+{
+    "board_id": "",
+    "website": {
+        "title": "Website title",
+        "hero_image": "url_to_background_image"
+    },
+}
+```
+
+if you run `./index.py` with the above config it will give you a list of boards you have access to and the ids. Copy the id for the board you are going to work with into the `board_id` value. Before you run `./index.py` ensure you have the trello keys set as environment variables. See the apikeys note below in running locally.
+
 
 ### Google Form
 Submissions are entered using a Google form and a google script converts these submissions into Trello cards, adding them to an `Inbox` list. An example google form is in [Form2Trello.gs](google_scripts/Form2Trello.gs). Changes that need to be made for every form are:
@@ -13,6 +30,8 @@ Submissions are entered using a Google form and a google script converts these s
  3. ```listId``` - The id of the `inbox` list on your trello board. Can be found at https://api.trello.com/1/boards/5e45bec960c5af7dbe375164/lists
  4. Line 91: depending on the order of your questions you may need to change the way the paper object is built
  5. Line 190: Converting submission type to labels. You need to map the submission types in the form to trello label ids which you can get from: https://api.trello.com/1/boards/5e45bec960c5af7dbe375164/labels
+
+The ids for the inbox list and labels can be found by navigating to the admin part of the conference website. List ids can be found in the section "Lists Setup" and label ids can be found and created in the "Edit Proposal Types" page.
 
 ### Trello setup
 
@@ -25,7 +44,7 @@ For the submission stage you need to create a list called `inbox` and have the f
 You also need a label called flagged:
  * Flagged
 
-This is used in the next stage to flag submissions that should be discussed in the Program Committee 
+This is used in the next stage to flag submissions that should be discussed in the Program Committee. These labels and lists can now be created using the Admin web interface as explained earlier. 
 
 ## Stage 2: Evaluation of submissions
 ### Trello setup
@@ -39,7 +58,7 @@ All Program Committee members need to be members of the trello board so they can
  * Weak Reject
  * Reject
 
-Note case and spaces are important. 
+Note case and spaces are important. It is safest to create these lists using the admin "Lists Setup" page. Users should be able to login as soon as they have been added to the board. Board admins will be able to access the admin interface.
 
 ### Submissions System
 This system allows Program Committee members to review the submissions assigned to them and select a review category from the list above. To deploy this system in production setup an [Amazon ECS](https://aws.amazon.com/ecs/) instance that can deploy the docker file `Dockerfile`. This will run the python web application on port 9000. The IIIF instance of this is aviliable at:

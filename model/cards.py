@@ -2,7 +2,7 @@
 
 import json
 import requests
-from . import users, trello, config
+from . import users, trello, config, auth
 import re
 
 class Cards:
@@ -21,12 +21,11 @@ class Cards:
         self.board_id = conf.board_id
 
     def getCardsForUserFromBoard(self, user, boardId):
-        url = 'https://api.trello.com/1/boards/{}/cards{}'.format(boardId, self.security)
-        cards = requests.get(url).json()
-
+        url = 'https://api.trello.com/1/boards/{}/cards'.format(boardId)
+        cards = trello.get(url).json()
         userCards = []
         for card in cards:
-            if user['id'] in card['idMembers']:
+            if user in card['idMembers']:
                 userCards.append(card)
                 
         return userCards        
@@ -35,7 +34,6 @@ class Cards:
         allCards = []
         for listName in lists:
             listCards = self.getCardsFromList(listName)
-            print ('Got {} cards from {}'.format(len(listCards), listName))
             allCards += listCards
 
         return allCards    
@@ -74,9 +72,9 @@ class Cards:
    #     return cards            
 
     def getCard(self, cardId, user=None):
-        url = 'https://api.trello.com/1/cards/{}{}'.format(cardId, self.security)
+        url = 'https://api.trello.com/1/cards/{}'.format(cardId)
         # add reviews
-        card = requests.get(url).json()
+        card = trello.get(url).json()
         if user:
             reviews = self.getReviews(cardId, user)
             if reviews:
@@ -91,42 +89,39 @@ class Cards:
         previousReview = self.getReviews(cardId, user)
         if decision == 'Request re-assignement':
             # add comment
-            url = "https://api.trello.com/1/cards/{}/actions/comments{}".format(cardId, self.security)
+            url = "https://api.trello.com/1/cards/{}/actions/comments".format(cardId)
             querystring = {"text":"{} requested resasignment.\nComment:\n{}".format(user['fullName'], comment)}
-            response = requests.request("POST", url, params=querystring)
+            response = trello.post(url, params=querystring)
             # remove membership
-            url = "https://api.trello.com/1/cards/{}/idMembers/{}{}".format(cardId, user['id'], self.security)
-            response = requests.request("DELETE", url)
+            url = "https://api.trello.com/1/cards/{}/idMembers/{}".format(cardId, user['id'])
+            response = trello.delete(url)
 
             # move card to inbox
-            url = "https://api.trello.com/1/cards/{}{}&idList={}".format(cardId, self.security, self.lists['Inbox'])
-            response = requests.request("PUT", url)
+            url = "https://api.trello.com/1/cards/{}?idList={}".format(cardId, self.lists['Inbox'])
+            response = trello.put(url)
         else:
             text = encodeReview(user, decision, comment)
             if previousReview: # this is an update
-                print ('Updating comment')
-                url = "https://api.trello.com/1/cards/{}/actions/{}/comments{}".format(cardId, previousReview[0]['id'], self.security)
+                url = "https://api.trello.com/1/cards/{}/actions/{}/comments".format(cardId, previousReview[0]['id'])
                 querystring = {"text": text}
-                response = requests.request("PUT", url, params=querystring)
+                response = trello.put(url, params=querystring)
             else: # This is new
-                print ('adding comment')
-                url = "https://api.trello.com/1/cards/{}/actions/comments{}".format(cardId, self.security)
+                url = "https://api.trello.com/1/cards/{}/actions/comments".format(cardId)
                 querystring = {"text":text}
-                response = requests.request("POST", url, params=querystring)
+                response = trello.put(url, params=querystring)
 
-            print (self.lists)
             if decision not in self.lists:
                 print ('Failed to find "{}" in:'.format(decision))
                 print (self.lists)
             else:    
                 # move card to correct list if not already there
-                url = "https://api.trello.com/1/cards/{}{}&idList={}".format(cardId, self.security, self.lists[decision])
-                response = requests.request("PUT", url)
+                url = "https://api.trello.com/1/cards/{}?idList={}".format(cardId, self.lists[decision])
+                response = trello.put(url)
 
     def addComment(self, cardId, comment):
-        url = "https://api.trello.com/1/cards/{}/actions/comments{}".format(cardId, self.security)
+        url = "https://api.trello.com/1/cards/{}/actions/comments".format(cardId)
         querystring = {"text":comment}
-        response = requests.request("POST", url, params=querystring)
+        response = trello.put(url, params=querystring)
         
     def addList(self, listName):
         if listName not in self.lists:
@@ -149,17 +144,17 @@ class Cards:
 
     def assignCard(self, userId, cardId):
         # First remove all other assigned users
-        url = 'https://api.trello.com/1//cards/{}/members{}'.format(cardId, self.security)
-        members = requests.get(url).json()
+        url = 'https://api.trello.com/1//cards/{}/members'.format(cardId)
+        members = trello.get(url).json()
         for member in members:
-            url = 'https://api.trello.com/1/cards/{}/idMembers/{}{}'.format(cardId, member['id'], self.security)
-            response = requests.request("DELETE", url)
+            url = 'https://api.trello.com/1/cards/{}/idMembers/{}'.format(cardId, member['id'])
+            response = trello.delete(url)
 
         if userId:
             # Then add new one
-            url = 'https://api.trello.com/1/cards/{}/idMembers{}&value={}'.format(cardId, self.security, userId)
+            url = 'https://api.trello.com/1/cards/{}/idMembers?value={}'.format(cardId, userId)
 
-            response = requests.request("POST", url)
+            response = trello.post(url)
             if response.status_code == 200:
                 return { "status": "Success"}
             else:
@@ -179,22 +174,20 @@ class Cards:
                 cardFlagged = True
                 break
 
-        print ('User is {}, card is {}'.format(flagged, cardFlagged))
         if flagged and not cardFlagged:
             # add flagged label
-            url = "https://api.trello.com/1/cards/{}/idLabels{}&value={}".format(cardId, self.security, self.labels['Flagged'])
-            print ('Posting to {}'.format(url))
-            self.printResponse(requests.request("POST", url))
+            url = "https://api.trello.com/1/cards/{}/idLabels?value={}".format(cardId, self.labels['Flagged'])
+            self.printResponse(trello.post(url))
 
         if cardFlagged and not flagged:
             # remove flagged label
-            url = "https://api.trello.com/1/cards/{}/idLabels/{}{}".format(cardId, self.labels['Flagged'], self.security)
-            self.printResponse(requests.request("DELETE", url))
+            url = "https://api.trello.com/1/cards/{}/idLabels/{}".format(cardId, self.labels['Flagged'])
+            self.printResponse(trello.delete(url))
             
     def getCardsByUser(self, boardId):
         # Get all Cards
-        url = 'https://api.trello.com/1/boards/{}/cards{}'.format(boardId, self.security)
-        cards = requests.get(url).json()
+        url = 'https://api.trello.com/1/boards/{}/cards'.format(boardId)
+        cards = trello.get(url).json()
         boardUsers = users.getUsersById(boardId)
         userCards = {}
         userCards['Unassigned'] = []
@@ -217,7 +210,8 @@ class Cards:
         if exclude:    
             lists = lists.copy()
             for value in exclude:
-                del lists[value]
+                if value in lists:
+                    del lists[value]
 
         if not types:
             types = self.labels
@@ -225,9 +219,7 @@ class Cards:
         results = {} 
         for listName in lists:
             for card in self.getCardsFromList(listName):
-                print ('Getting card {}'.format(card['name']))
                 for label in card['labels']:
-                    print ('Is label {} in card {}'.format(label['name'], types))
                     if label['name'] in types:
                         if label['name'] not in results:
                             results[label['name']] = []
@@ -241,13 +233,13 @@ class Cards:
             print (response.text)
 
     def getReviews(self, cardId, user=None):    
-        url = 'https://api.trello.com/1/cards/{}/actions{}'.format(cardId, self.security)
+        url = 'https://api.trello.com/1/cards/{}/actions'.format(cardId)
 
         reviews = []
-        for comment in requests.get(url).json():
+        for comment in trello.get(url).json():
             if 'text' in comment['data'] and comment['data']['text'].startswith('Review:'):
                 if user: # if user is supplied only return the ones linked to the correct user
-                    if user['fullName'] in comment['data']['text']:
+                    if user['id'] in comment['idMemberCreator']:
                         reviews.append(comment)
                 else: # if no user return all valid reviews
                     reviews.append(comment)

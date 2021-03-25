@@ -1,0 +1,16 @@
+#add_type {
+    background-color: white;
+    padding: 10px;
+    border-radius: .3rem;
+}
+#add_type form {
+    padding: 10px;
+}
+
+.form-inline div {
+    padding-right: 10px;
+}
+
+#color {
+    background: #61bd4f;
+}

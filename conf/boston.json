@@ -20,6 +20,13 @@
             "from": "events@iiif.io",
             "subject": "IIIF Annual Conference Postponed due to COVID-19 (coronavirus)",
             "text": "email_templates/boston/postponement.txt"
+        },
+        "cancel": {
+            "lists": ["Strong Accept", "Accept", "Weak Accept", "Borderline Paper","Ready to go", "Questions on acceptance", "Scheduling", "Needs work"],
+            "includeFlagged": "true",
+            "from": "events@iiif.io",
+            "subject": "RE: IIIF Annual Conference Postponed due to COVID-19 (coronavirus)",
+            "text": "email_templates/boston/cancel.txt"
         }
     }
 }

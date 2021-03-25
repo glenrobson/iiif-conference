@@ -21,28 +21,11 @@
 	<div class="d-flex justify-content-center h-100">
 		<div class="card">
 			<div class="card-header">
-				<h3>Sign in <div class="float-right"><img src="https://i0.wp.com/www.clir.org/wp-content/uploads/sites/6/2016/09/IIIF-logo-500w.png?w=500&ssl=1" height="50px"/></div></h3>
+				<h2>Log in</h2><div class="float-right"><img src="https://i0.wp.com/www.clir.org/wp-content/uploads/sites/6/2016/09/IIIF-logo-500w.png?w=500&ssl=1" height="50px"/></div>
 			</div>
 			<div class="card-body">
-				<form action="/login" method="POST">
-					<div class="input-group form-group">
-						<div class="input-group-prepend">
-							<span class="input-group-text"><i class="fas fa-user"></i></span>
-						</div>
-						<input type="text" name="username" class="form-control" placeholder="username">
-						
-					</div>
-					<div class="input-group form-group">
-						<div class="input-group-prepend">
-							<span class="input-group-text"><i class="fas fa-key"></i></span>
-						</div>
-						<input type="password" name="password" class="form-control" placeholder="password">
-					</div>
-					<div class="form-group">
-						<input type="submit" value="Login" class="btn float-right login_btn">
-					</div>
-				</form>
-			</div>
+                <a id="trello_link" href="/login"><img src="static/img/logo-gradient-blue-trello.svg"/></a>
+            </div>
 			<div class="card-footer">
 				<div class="d-flex justify-content-center links">
                     {{ conf.website('title') }}
