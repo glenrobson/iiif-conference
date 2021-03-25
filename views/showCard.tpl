@@ -3,6 +3,7 @@ from model import cards
 
 if 'review' in card:
     (reviewUser, decision, comment) = cards.decodeReview(card['review']['data']['text'])
+    print ("user {} decision '{}' comment {}".format(reviewUser, decision, comment))
 else:
     (reviewUser, decision, comment) = ('', '', '')
 end

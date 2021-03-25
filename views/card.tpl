@@ -48,13 +48,15 @@
         </td>
          % if includeAction:
             <td>
-                <a class="btn btn-primary" href="review/{{ card['id'] }}.html" role="button">
-                    % if lists[card['idList']] != 'Inbox':
+                % if lists[card['idList']] != 'Inbox':
+                    <a class="btn btn-secondary" href="review/{{ card['id'] }}.html" role="button">
                         Edit Review
-                    % else:    
+                    </a>
+                % else:    
+                    <a class="btn btn-dark" href="review/{{ card['id'] }}.html" role="button">
                         Add Review
-                    % end
-                </a>
+                    </a>
+                % end
             </td>
          % end    
     </tr>

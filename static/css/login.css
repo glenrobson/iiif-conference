@@ -15,17 +15,17 @@ align-content: center;
 }
 
 .card{
-height: 370px;
-margin-top: auto;
-margin-bottom: auto;
-width: 400px;
-background-color: rgba(0,0,0,0.5) !important;
+    height: 270px;
+    margin-top: auto;
+    margin-bottom: auto;
+    width: 400px;
+    background-color: rgba(0,0,0,0.5) !important;
 }
 
 .social_icon span{
-font-size: 60px;
-margin-left: 10px;
-color: #FFC312;
+    font-size: 60px;
+    margin-left: 10px;
+    color: #FFC312;
 }
 
 .social_icon span:hover{
@@ -33,8 +33,15 @@ color: white;
 cursor: pointer;
 }
 
-.card-header h3{
-color: white;
+.card-header {
+    background-color: #f9fcff;
+}
+.card-header h2{
+    display:inline;
+    display: inline-block;
+    margin-top: 20px;
+    margin-bottom: 5px;
+    font-family: Verdana, Helvetica, sans-serif;
 }
 
 .social_icon{
@@ -81,9 +88,24 @@ background-color: white;
 }
 
 .links{
-color: white;
+    color: white;
+    font-family: Verdana, Helvetica, sans-serif;
 }
 
 .links a{
 margin-left: 4px;
+}
+
+#trello_link {
+    background-color: white;
+    width: 100%;
+    display: inline-block;
+    text-align: center;
+    padding: 10px;
+    border-radius: 25px;
+    box-shadow: outset 3px 3px 10px 0 #000;
+}
+
+#trello_link:hover {
+    background-color: #e7dcdc;
 }
