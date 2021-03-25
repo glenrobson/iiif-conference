@@ -58,7 +58,7 @@ All Program Committee members need to be members of the trello board so they can
  * Weak Reject
  * Reject
 
-Note case and spaces are important. It is safest to create these lists using the admin "Lists Setup" page.
+Note case and spaces are important. It is safest to create these lists using the admin "Lists Setup" page. Users should be able to login as soon as they have been added to the board. Board admins will be able to access the admin interface.
 
 ### Submissions System
 This system allows Program Committee members to review the submissions assigned to them and select a review category from the list above. To deploy this system in production setup an [Amazon ECS](https://aws.amazon.com/ecs/) instance that can deploy the docker file `Dockerfile`. This will run the python web application on port 9000. The IIIF instance of this is aviliable at:
