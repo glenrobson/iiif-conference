@@ -22,7 +22,9 @@ class Cards:
 
     def getCardsForUserFromBoard(self, user, boardId):
         url = 'https://api.trello.com/1/boards/{}/cards'.format(boardId)
-        cards = trello.get(url).json()
+        response = trello.get(url)
+        response.raise_for_status()
+        cards = response.json()
         userCards = []
         for card in cards:
             if user in card['idMembers']:
@@ -108,7 +110,8 @@ class Cards:
             else: # This is new
                 url = "https://api.trello.com/1/cards/{}/actions/comments".format(cardId)
                 querystring = {"text":text}
-                response = trello.put(url, params=querystring)
+                response = trello.post(url, params=querystring)
+                #print ('{}: {}'.format(response.status_code, response.text))
 
             if decision not in self.lists:
                 print ('Failed to find "{}" in:'.format(decision))

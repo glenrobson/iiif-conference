@@ -9,6 +9,7 @@ from model import cards, boards, users, auth
 from model.config import Config
 import requests
 from requests_oauthlib import OAuth1Session
+from requests import HTTPError
 
 client_id = "8a8baa2376c78e1ef98bef023637faac"
 client_secret = "8811b7eaf802c8372bda59d0c3d24b2928a936e26ced7f895a899cfc2d80201a"
@@ -164,11 +165,17 @@ def addList():
 def showIndex():
     auth.require(fail_redirect='/login.html')
     user = auth.getUser()
-    data = cardsObj.getCardsForUserFromBoard(user['id'], board_id)
-    (lists, idLists) = boards.getLists(board_id)
+    try:
+        data = cardsObj.getCardsForUserFromBoard(user['id'], board_id)
+        (lists, idLists) = boards.getLists(board_id)
 
-    output = template('views/showSubmissions.tpl', cardsJson=data, user=user, role=auth.getRole(), lists=idLists)
-    return output
+        return template('views/showSubmissions.tpl', cardsJson=data, user=user, role=auth.getRole(), lists=idLists)
+    except HTTPError as error:
+        code=error.response.status_code
+        body = """
+            User: <b>{}</b> does not have permission to access the Trello board. Have you accepted the inivtation? 
+        """.format(auth.getUser()['fullName'])
+        return template('views/error.tpl', error_title="{} Error".format(code), error_body=body)
     
 @get("/favicon.ico")
 def favicon():
@@ -218,7 +225,10 @@ def login():
         redirect('/') 
         
     """Authenticate users"""
-    oauth = OAuth1Session(client_id, client_secret=client_secret, callback_uri='https://conference.iiif.io/callback')
+    callbackURL = 'https://conference.iiif.io/callback'
+    if local:
+        callbackURL = 'http://0.0.0.0:9000/callback'
+    oauth = OAuth1Session(client_id, client_secret=client_secret, callback_uri=callbackURL)
     fetch_response = oauth.fetch_request_token('https://trello.com/1/OAuthGetRequestToken')
     session['tmp_oauth_token'] = fetch_response.get('oauth_token')
     session['tmp_oauth_secret'] = fetch_response.get('oauth_token_secret')
@@ -240,8 +250,10 @@ def logout():
     #session.delete()
     redirect('/login.html')    
 
+local=False
 if __name__ == "__main__":
-
+    if len(sys.argv) > 1:
+        local=True
     app = bottle.app()
     session_opts = {
         'session.cookie_expires': True,
@@ -255,5 +267,5 @@ if __name__ == "__main__":
     }
     app = SessionMiddleware(app, session_opts)
 
-    debug(True)
+    #debug(True)
     run(app=app, host='0.0.0.0', port=9000, use_reloader=True, threaded=True)
