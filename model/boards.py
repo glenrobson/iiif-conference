@@ -36,7 +36,7 @@ def getLists(boardId):
 def getListDetail(boardId):
     url = 'https://api.trello.com/1/boards/{}/lists?cards=none&fields=all'.format(boardId)
     response = trello.get(url)
-    print(json.dumps(response.json(),indent=4))
+    #print(json.dumps(response.json(),indent=4))
     return response.json()
 
 def addList(boardId, name):
@@ -45,8 +45,7 @@ def addList(boardId, name):
     response = trello.post(url)
     if not response.ok:
         print ("Failed to add list due to {}: {}".format(response.status_code, response.text))
-    print (response)    
-    print (response.text)    
+
     return response
 
 def getLabels(boardId):
@@ -67,7 +66,6 @@ def getLabelDetail(boardId):
     return response.json()
 
 def addLabel(boardId, name, colour):
-    print ('name {} colour {}'.format(name,colour))
     url = "https://api.trello.com/1/boards/{}/labels?name={}&color={}".format(boardId, name, colour)
 
     response = trello.post(url)
