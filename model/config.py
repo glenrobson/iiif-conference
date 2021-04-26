@@ -14,6 +14,10 @@ class Config:
     @property
     def board_id(self):
         return self.config['board_id']
+    
+    @property
+    def tracks_id(self):
+        return self.config['tracks_board']
 
     def email_template(self, name):    
         with open(self.config['email_templates'][name], 'r') as outfile:

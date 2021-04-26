@@ -5,7 +5,7 @@ import os
 import bottle
 from bottle import route, run, template,debug, get, static_file, post, get,request, redirect, response
 from beaker.middleware import SessionMiddleware
-from model import cards, boards, users, auth 
+from model import cards, boards, users, auth, reports 
 from model.config import Config
 import requests
 from requests_oauthlib import OAuth1Session
@@ -131,6 +131,16 @@ def setupLabels():
     
     return template('views/admin/setupLabels.tpl', data=labelsDetails, user=auth.getUser(), role=auth.getRole())
 
+@route('/admin/reports/tracks.csv')
+def generateTracksReport():
+    (trackLists, idListsTrack) = boards.getLists(conf.tracks_id)
+    trackLabels = boards.getLabels(board_id)
+
+    trackCardsObj  = cards.Cards(trackLists, trackLabels)
+
+    response.content_type = 'text/csv'
+    return reports.trackReport(trackCardsObj)
+
 @post('/admin/add_label')    
 def addLabel():
     auth.require(role='admin', fail_redirect='/login.html')
@@ -171,12 +181,8 @@ def showIndex():
 
         return template('views/showSubmissions.tpl', cardsJson=data, user=user, role=auth.getRole(), lists=idLists)
     except HTTPError as error:
-        code=error.response.status_code
-        body = """
-            User: <b>{}</b> does not have permission to access the Trello board. Have you accepted the inivtation? 
-        """.format(auth.getUser()['fullName'])
-        return template('views/error.tpl', error_title="{} Error".format(code), error_body=body)
-    
+        return showPermissionDenied(error)
+            
 @get("/favicon.ico")
 def favicon():
     return static_file('img/favicon.ico', root="static")
@@ -197,7 +203,6 @@ def callback():
                           resource_owner_key=session['tmp_oauth_token'],
                           resource_owner_secret=session['tmp_oauth_secret'],
                           verifier=verifier)
-
     oauth_tokens = oauth.fetch_access_token(access_token_url)
     resource_owner_key = oauth_tokens.get('oauth_token')
     resource_owner_secret = oauth_tokens.get('oauth_token_secret')
@@ -211,8 +216,18 @@ def callback():
                           resource_owner_key=resource_owner_key,
                           resource_owner_secret=resource_owner_secret)
 
-    auth.storeCurrentUser(board_id)
-    redirect('/') 
+    try:
+        auth.storeCurrentUser(board_id)
+        redirect('/') 
+    except HTTPError as error:
+        return showPermissionDenied(error)
+
+def showPermissionDenied(error):
+    code=error.response.status_code
+    body = """
+    User: <b>{} ({})</b> does not have permission to access the Trello board. Have you accepted the inivtation? 
+    """.format(auth.getUser()['fullName'], auth.getUser()['username'])
+    return template('views/error.tpl', error_title="{} Error".format(code), error_body=body)
 
 @get('/login')
 def login():
@@ -221,8 +236,11 @@ def login():
         redirect('/') 
     
     if auth.haveTokens():
-        auth.storeCurrentUser(board_id)
-        redirect('/') 
+        try:
+            auth.storeCurrentUser(board_id)
+            redirect('/') 
+        except HTTPError as error:
+            return showPermissionDenied(error)
         
     """Authenticate users"""
     callbackURL = 'https://conference.iiif.io/callback'
