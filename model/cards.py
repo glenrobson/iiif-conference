@@ -5,6 +5,88 @@ import requests
 from . import users, trello, config, auth
 import re
 
+"""
+    User Obj:
+
+{
+    "id": "6081a5a67c56bd0c0fe5c268",
+    "checkItemStates": null,
+    "closed": false,
+    "dateLastActivity": "2021-04-22T18:40:37.396Z",
+    "desc": "**Contact**\n - Sean Fraga, sfraga@usc.edu\n\n**Authors**\n- Sean Fraga, University of Southern California, United States\n- Christy Ye, University of Southern California, United States\n- Samir Ghosh, University of Southern California, United States\n\n**Comments**\n\n\n**Topics**\n- Interoperability in IIIF contexts and beyond\n- Discovering IIIF resources\n\n**Keywords:** Augmented reality, IIIF, \n\n**Abstract:**\n\tExisting viewers for IIIF-compliant materials, like Mirador and OpenSeadragon, make it possible for a user to interact with digitized resources across different repositories. But the web-based nature of these viewers means that these interactions are necessarily constrained by the size of the user\u2019s screen. This limits the amount of content in view, creates friction that impedes discovery, and divorces an item\u2019s content from its physical form. \n\tAugmented reality (AR) offers a new interface for user interaction with digitized archival materials, one that enables a user to interact with a digitized resource as if it were physically present in their real-world environment. Booksnake is an AR viewer for IIIF-compliant resources, presented as an iOS app. Booksnake connects IIIF\u2019s image and presentation APIs with Apple\u2019s ARKit, the AR technology built in to every recent iPhone and iPad. \n\tWith Booksnake, a user can select an IIIF-compliant resource, open their device\u2019s camera view, and overlay the digitized item on a horizontal surface in the real world. Booksnake anchors the digitized item to that surface and maintains the item\u2019s relative size and position. This enables the user to explore the item by physically moving around it, drawing closer to focus on key elements and stepping back to get the whole view, as if they were interacting with it in a reading room. \n\tBy using AR to recreate the embodied exploration of archival material in digitized form, Booksnake opens new possibilities for humanities computing, mixed reality, and teaching and learning. By leveraging an interface uniquely suited to mobile devices, Booksnake enriches interactions with IIIF resources and enables new discoveries.\n\tBooksnake is being developed by a multidisciplinary team of historians, librarians, artists, and computer programmers. The app is currently in beta testing. This presentation will discuss the project\u2019s genesis, explain how Booksnake uses IIIF APIs, showcase Booksnake\u2019s current capabilities, and preview future directions.\n",
+    "descData": null,
+    "dueReminder": null,
+    "idBoard": "6081a5a67c56bd0c0fe5c1cd",
+    "idList": "6081c2f8301bc53092c44aa3",
+    "idMembersVoted": [],
+    "idShort": 65,
+    "idAttachmentCover": null,
+    "idLabels": [
+        "6081a5a67c56bd0c0fe5c298",
+        "6081a5e769211287c61bff0e"
+    ],
+    "manualCoverAttachment": false,
+    "name": "65. Introducing Booksnake: An Augmented Reality Viewer for IIIF-compliant Materials by Sean Fraga, Christy Ye and Samir Ghosh",
+    "pos": 933889,
+    "shortLink": "0Hho2Zx5",
+    "isTemplate": false,
+    "cardRole": null,
+    "badges": {
+        "attachmentsByType": {
+            "trello": {
+                "board": 0,
+                "card": 0
+            }
+        },
+        "location": false,
+        "votes": 0,
+        "viewingMemberVoted": false,
+        "subscribed": false,
+        "fogbugz": "",
+        "checkItems": 0,
+        "checkItemsChecked": 0,
+        "checkItemsEarliestDue": null,
+        "comments": 0,
+        "attachments": 1,
+        "description": true,
+        "due": null,
+        "dueComplete": false,
+        "start": null
+    },
+    "dueComplete": false,
+    "due": null,
+    "idChecklists": [],
+    "idMembers": [],
+    "labels": [
+        {
+            "id": "6081a5a67c56bd0c0fe5c298",
+            "idBoard": "6081a5a67c56bd0c0fe5c1cd",
+            "name": "Presentation (20mins)",
+            "color": "blue"
+        },
+        {
+            "id": "6081a5e769211287c61bff0e",
+            "idBoard": "6081a5a67c56bd0c0fe5c1cd",
+            "name": "Accepted",
+            "color": "lime"
+        }
+    ],
+    "shortUrl": "https://trello.com/c/0Hho2Zx5",
+    "start": null,
+    "subscribed": false,
+    "url": "https://trello.com/c/0Hho2Zx5/65-65-introducing-booksnake-an-augmented-reality-viewer-for-iiif-compliant-materials-by-sean-fraga-christy-ye-and-samir-ghosh",
+    "cover": {
+        "idAttachment": null,
+        "color": null,
+        "idUploadedBackground": null,
+        "size": "normal",
+        "brightness": "dark",
+        "idPlugin": null
+    }
+}
+
+"""
+
 class Cards:
     security = ''
     # Hash table { 'listName' => 'list_id' }

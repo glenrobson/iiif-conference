@@ -36,7 +36,10 @@ def getUsersById(boardId):
 
 def getRole(boardId, userId):
     url = 'https://api.trello.com/1/boards/{}/memberships'.format(boardId)
-    permissions = trello.get(url).json()
+    print (trello.get(url))
+    response = trello.get(url)
+    response.raise_for_status()
+    permissions = response.json()
     role = "unknown"
     for permission in permissions:
         if permission['idMember'] == userId:
