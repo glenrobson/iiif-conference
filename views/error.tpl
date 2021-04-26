@@ -16,6 +16,29 @@
 	<link rel="stylesheet" type="text/css" href="static/css/login.css">
 </head>
 <body style="background-image: url('{{ conf.website('hero_image') }}');">
+<nav class="navbar navbar-expand-md navbar-dark bg-dark btco-hover-menu">
+    <a class="navbar-brand" href="https://iiif.io"><img src="https://i0.wp.com/www.clir.org/wp-content/uploads/sites/6/2016/09/IIIF-logo-500w.png?w=500&ssl=1" height="30px"/></a>
+    <a class="navbar-brand" href="/index.html">{{ conf.website('title') }}</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    % if defined('role') and role == 'admin':
+        <div class="navbar-collapse collapse w-100 order-2 dual-collapse2">
+            <ul class="navbar-nav m1-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="/admin.html">Admin</a>
+                </li>
+            </ul>    
+        </div>
+    % end 
+    <div class="navbar-collapse collapse w-100 order-3 dual-collapse2">
+        <ul class="navbar-nav m1-auto" style="right: 20px; position: absolute;">
+            <li class="nav-item">
+                <a class="nav-link" href="/logout">Logout</a>
+            </li>
+        </ul>    
+    </div>
+</nav>
 <div class="container">
 	<div class="d-flex justify-content-center h-100">
 		<div class="card">

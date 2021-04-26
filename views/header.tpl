@@ -26,7 +26,7 @@
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
     </button>
-    % if role == 'admin':
+    % if defined('role') and role == 'admin':
         <div class="navbar-collapse collapse w-100 order-2 dual-collapse2">
             <ul class="navbar-nav m1-auto">
                 <li class="nav-item">
